@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Session — {{ category }}</title>
+    <meta name="description" content="Live AI interview session with real-time behavioral analysis.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-mesh">
+        <div class="bg-mesh-blob"></div>
+        <div class="dot-grid"></div>
+    </div>
+
+    <!-- Premium Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="cube-scene">
+            <div class="cube">
+                <div class="cube-face cube-face--front"></div>
+                <div class="cube-face cube-face--back"></div>
+                <div class="cube-face cube-face--right"></div>
+                <div class="cube-face cube-face--left"></div>
+                <div class="cube-face cube-face--top"></div>
+                <div class="cube-face cube-face--bottom"></div>
+            </div>
+        </div>
+
+        <div class="loading-steps" id="loadingSteps">
+            <div class="loading-step" data-step="0">
+                <span class="loading-step-dot"></span>
+                <span>Analyzing behavioral metrics</span>
+            </div>
+            <div class="loading-step" data-step="1">
+                <span class="loading-step-dot"></span>
+                <span>Detecting facial emotions</span>
+            </div>
+            <div class="loading-step" data-step="2">
+                <span class="loading-step-dot"></span>
+                <span>Evaluating your answer with AI</span>
+            </div>
+            <div class="loading-step" data-step="3">
+                <span class="loading-step-dot"></span>
+                <span>Generating your report</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-container interview-container">
+        <div class="interview-split">
+            
+            <!-- Left Pane: Question, Instructions & Controls -->
+            <div class="interview-left-pane">
+                <div class="interview-header">
+                    <span class="category-label">{{ category }} Interview</span>
+                    <h1 class="question-text">"{{ question }}"</h1>
+                </div>
+
+                <div class="instruction-box card">
+                    <div class="instruction-header">
+                        <span class="instruction-icon">💡</span>
+                        <span>Interview Guidance</span>
+                    </div>
+                    <ul class="instruction-list">
+                        <li>Maintain steady eye contact with your camera.</li>
+                        <li>Speak clearly and outline key details in your response.</li>
+                        <li>Press <strong>Start Recording</strong> when ready, then <strong>Submit Answer</strong> when finished.</li>
+                    </ul>
+                </div>
+
+                <div class="control-panel card">
+                    <div class="timer-display" id="timerDisplay">00:00</div>
+
+                    <div class="interview-controls">
+                        <button id="recordBtn" type="button" class="btn-primary">
+                            <span class="btn-icon">🎙️</span>
+                            <span>Start Recording</span>
+                        </button>
+
+                        <form id="answerForm" action="/result" method="POST" class="submit-form">
+                            <input type="hidden" name="image_data" id="image_data">
+                            <input type="hidden" name="speech_text" id="speech_text">
+                            <input type="hidden" name="question" value="{{ question }}">
+                            <input type="hidden" name="category" value="{{ category }}">
+                            <button id="startBtn" type="submit" class="btn-secondary">
+                                <span>Submit Answer</span>
+                                <span class="btn-icon">➔</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="status-row">
+                        <span id="recordDot" class="record-dot"></span>
+                        <p id="statusText" class="status-text">Ready to record</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Pane: Webcam Video Feed -->
+            <div class="interview-right-pane">
+                <section class="card webcam-card" id="webcam-card">
+                    <div class="video-wrapper">
+                        <video id="webcam" autoplay playsinline muted></video>
+                        <div class="vision-status-badge">
+                            <span class="vision-dot"></span>
+                            <span>Vision AI Active</span>
+                        </div>
+                    </div>
+
+                    <canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

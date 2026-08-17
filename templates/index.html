@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Readiness Coach — AI-Powered Practice</title>
+    <meta name="description" content="Practice interviews with AI-powered real-time feedback on facial expressions, behavioral metrics, and spoken answers.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Animated gradient mesh background -->
+    <div class="bg-mesh">
+        <div class="bg-mesh-blob"></div>
+        <div class="dot-grid"></div>
+    </div>
+
+    <div class="page-container index-container">
+        <div class="index-grid">
+            
+            <!-- Left Side: Branding & Features -->
+            <div class="index-hero-left">
+                <div class="hero-badge">
+                    <span class="pulse-dot"></span>
+                    <span>AI-Powered Interview Coach</span>
+                </div>
+                <h1 class="index-title">Master Your Next Interview</h1>
+                <p class="index-subtitle">
+                    Get instant, comprehensive feedback on your visual confidence, emotional poise, and spoken answers — powered by real-time Computer Vision & Gemini AI.
+                </p>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">👁️</div>
+                        <div class="feature-text">
+                            <h3>Vision ML Tracking</h3>
+                            <p>Measures eye contact, focus stability, and distraction patterns frame-by-frame.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">🎭</div>
+                        <div class="feature-text">
+                            <h3>Emotion Analysis</h3>
+                            <p>Detects subtle facial expressions to evaluate calm confidence under pressure.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-text">
+                            <h3>Gemini AI Evaluation</h3>
+                            <p>Transcribes your answer audio and generates actionable strengths & improvement tips.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Category Selection Card -->
+            <div class="index-hero-right">
+                <section class="card index-card" id="hero-card">
+                    <div class="hero-card-header">
+                        <div class="hero-icon">🎯</div>
+                        <h2>Select Question Category</h2>
+                        <p class="card-hint">Choose a domain to start your mock session</p>
+                    </div>
+
+                    <form action="/interview" method="POST" class="index-form" id="interview-form">
+                        <div class="category-grid">
+                            <div class="category-option">
+                                <input type="radio" name="category" id="cat-hr" value="HR" required checked>
+                                <label for="cat-hr">
+                                    <span class="cat-icon">💼</span>
+                                    <span class="cat-name">HR</span>
+                                </label>
+                            </div>
+                            <div class="category-option">
+                                <input type="radio" name="category" id="cat-tech" value="Technical">
+                                <label for="cat-tech">
+                                    <span class="cat-icon">⚙️</span>
+                                    <span class="cat-name">Technical</span>
+                                </label>
+                            </div>
+                            <div class="category-option">
+                                <input type="radio" name="category" id="cat-behav" value="Behavioral">
+                                <label for="cat-behav">
+                                    <span class="cat-icon">🧠</span>
+                                    <span class="cat-name">Behavioral</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary index-submit" id="start-btn">
+                            <span>Start Interview Session</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </form>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 3D card tilt effect on mouse move
+        const card = document.getElementById('hero-card');
+        const container = document.querySelector('.index-hero-right');
+
+        if (container && card) {
+            container.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const mouseX = e.clientX - centerX;
+                const mouseY = e.clientY - centerY;
+                
+                const rotateX = (mouseY / rect.height) * -6;
+                const rotateY = (mouseX / rect.width) * 6;
+                
+                card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+                card.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                setTimeout(() => { card.style.transition = ''; }, 600);
+            });
+        }
+    </script>
+</body>
+</html>

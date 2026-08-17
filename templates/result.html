@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Analysis — Report Card</title>
+    <meta name="description"
+        content="Your AI-powered interview performance analysis with behavioral metrics, emotion detection, and expert feedback.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <!-- Animated background -->
+    <div class="bg-mesh">
+        <div class="bg-mesh-blob"></div>
+        <div class="dot-grid"></div>
+    </div>
+
+    <div class="result-page">
+
+        <!-- ===== TOP HEADER BANNER ===== -->
+        <header class="result-hero-banner card">
+            <div class="result-hero-info">
+                <span class="category-label">{{ category }} Interview</span>
+                <h1 class="result-hero-question">"{{ question }}"</h1>
+            </div>
+
+            {% set gauge_class = '' %}
+            {% if confidence|lower == 'confident' %}
+            {% set gauge_class = 'score-gauge--confident' %}
+            {% elif confidence|lower == 'nervous' %}
+            {% set gauge_class = 'score-gauge--nervous' %}
+            {% elif confidence|lower == 'distracted' %}
+            {% set gauge_class = 'score-gauge--distracted' %}
+            {% endif %}
+
+            <div class="score-gauge {{ gauge_class }}">
+                <div class="score-gauge-inner">
+                    <span class="score-label">{{ confidence }}</span>
+                    <span class="score-sublabel">Overall Verdict</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== REPORT CARD MAIN GRID ===== -->
+        <div class="report-card-grid">
+
+            <!-- ============================================ -->
+            <!-- LEFT COLUMN: AI GEMINI FEEDBACK (HERO STAR)   -->
+            <!-- ============================================ -->
+            <div class="report-card-hero">
+                <section class="card eval-card" id="eval-card">
+                    <div class="section-label">
+                        <span class="label-icon">🤖</span>
+                        AI Gemini Answer Evaluation
+                    </div>
+
+                    {% if feedback is mapping and feedback.raw %}
+                    <div class="raw-feedback">
+                        <p>{{ feedback.raw }}</p>
+                    </div>
+                    {% elif feedback is mapping %}
+                    <div class="transcription-block">
+                        <h3>What You Said</h3>
+                        <blockquote>"{{ feedback.transcription }}"</blockquote>
+                    </div>
+
+                    <div class="feedback-grid">
+                        <div class="feedback-column strengths">
+                            <h3><span class="fb-icon">✅</span> Key Strengths</h3>
+                            <ul>
+                                {% for point in feedback.strengths %}
+                                <li style="animation-delay: {{ loop.index0 * 0.1 }}s">{{ point }}</li>
+                                {% else %}
+                                <li>No explicit strengths identified.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="feedback-column improvements">
+                            <h3><span class="fb-icon">🎯</span> Areas to Improve</h3>
+                            <ul>
+                                {% for point in feedback.improvements %}
+                                <li style="animation-delay: {{ loop.index0 * 0.1 + 0.3 }}s">{{ point }}</li>
+                                {% else %}
+                                <li>No areas for improvement identified.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="raw-feedback">
+                        <p>{{ feedback }}</p>
+                    </div>
+                    {% endif %}
+                </section>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- RIGHT COLUMN: SUPPORTING BEHAVIORAL & EMOTION -->
+            <!-- ============================================ -->
+            <div class="report-card-sidebar">
+
+                <!-- --- Behavioral Analysis --- -->
+                <div class="card" id="behavioral-card">
+                    <div class="section-label">
+                        <span class="label-icon">👁️</span>
+                        Behavioral Tracking Metrics
+                    </div>
+
+                    <div class="metrics-row">
+                        <div class="metric-tile">
+                            <span class="metric-value"
+                                data-count="{{ (metrics or {}).get('eye_contact_percentage', 0) }}">0</span>
+                            <span class="metric-label">Eye Contact %</span>
+                        </div>
+                        <div class="metric-tile">
+                            <span class="metric-value" data-count="{{ (metrics or {}).get('look_away_count', 0) }}">0</span>
+                            <span class="metric-label">Look Aways</span>
+                        </div>
+                        <div class="metric-tile">
+                            <span class="metric-value" data-count="{{ (metrics or {}).get('distraction_duration', 0) }}"
+                                data-suffix="s">0</span>
+                            <span class="metric-label">Distraction</span>
+                        </div>
+                        <div class="metric-tile">
+                            <span class="metric-value" data-count="{{ (metrics or {}).get('session_length', 0) }}"
+                                data-suffix="s">0</span>
+                            <span class="metric-label">Session Length</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-wrap">
+                        <canvas id="behavioralChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- --- Emotion Analysis --- -->
+                <div class="card" id="emotion-card">
+                    <div class="section-label">
+                        <span class="label-icon">🎭</span>
+                        Emotion AI Analysis
+                    </div>
+
+                    <div class="emotion-verdict">
+                        <span class="emotion-verdict-label">Emotion Poise:</span>
+                        {% set em_badge = '' %}
+                        {% if emotion_confidence|lower == 'confident' %}
+                        {% set em_badge = 'badge-confident' %}
+                        {% elif emotion_confidence|lower == 'nervous' %}
+                        {% set em_badge = 'badge-nervous' %}
+                        {% elif emotion_confidence|lower == 'distracted' %}
+                        {% set em_badge = 'badge-distracted' %}
+                        {% endif %}
+                        <span class="confidence-badge {{ em_badge }}">{{ emotion_confidence }}</span>
+                    </div>
+
+                    <div class="emotion-chart-container">
+                        <div class="emotion-chart-wrap">
+                            <canvas id="emotionChart"></canvas>
+                        </div>
+                        <div class="emotion-legend" id="emotionLegend">
+                            {% for emotion, pct in (emotion_percentages or {}).items() %}
+                            <div class="emotion-legend-item">
+                                <span class="emotion-dot"
+                                    style="background: var(--emotion-color-{{ loop.index0 }}, #7C5CFC);"></span>
+                                <span>{{ emotion | capitalize }}</span>
+                                <span class="emotion-pct">{{ pct }}%</span>
+                            </div>
+                            {% else %}
+                            <div class="emotion-legend-item">
+                                <span>No emotion data available</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===== CTA ===== -->
+        <div class="cta-section">
+            <a href="/" class="btn-primary" id="try-again-btn">
+                <span>Try Another Question</span>
+                <span class="btn-arrow">→</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Pass data to JS for charts -->
+    <script>
+        window.INTERVIEW_DATA = {
+            metrics: {{ (metrics or {}) | tojson }},
+            emotionPercentages: {{ (emotion_percentages or {}) | tojson }},
+            confidence: {{ (confidence or "Unknown") | tojson }}
+        };
+    </script>
+    <script src="{{ url_for('static', filename='result.js') }}"></script>
+</body>
+
+</html>
